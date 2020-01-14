@@ -3,8 +3,12 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
+
+	"github.com/urfave/negroni"
 
 	"github.com/fdiezdev/edcomments/migrations"
+	"github.com/fdiezdev/edcomments/routes"
 )
 
 func main() {
@@ -20,4 +24,23 @@ func main() {
 		log.Println("¡Migración completada!")
 
 	}
+
+	// Iniciando enrutador
+	router := routes.InitRoutes()
+
+	// Iniciando middlewares
+	n := negroni.Classic()
+	n.UseHandler(router)
+
+	// Iniciando servidor
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: n,
+	}
+
+	log.Println("Servidor iniciado en http://localhost:8080")
+
+	log.Println(server.ListenAndServe())
+
+	log.Println("End")
 }
