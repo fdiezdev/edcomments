@@ -43,7 +43,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.Write(j)
 	} else {
 		m := models.Message{
-			Message:    "Error: Correo o contraseña incorrectos",
+			Message:    "Correo o contraseña incorrectos",
 			StatusCode: http.StatusUnauthorized,
 		}
 
@@ -66,7 +66,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user.Password != user.ConfirmPassword {
-		m.Message = fmt.Sprint("Error: las contraseñas no coinciden")
+		m.Message = fmt.Sprint("Las contraseñas no coinciden")
 		m.StatusCode = http.StatusBadRequest
 
 		commons.DisplayMessage(w, m)
@@ -74,7 +74,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(user.Password) < 8 {
-		m.Message = fmt.Sprint("Error: la contraseña no tiene 8 caracteres como mínimo")
+		m.Message = fmt.Sprint("La contraseña no tiene 8 caracteres como mínimo")
 		m.StatusCode = http.StatusBadRequest
 
 		commons.DisplayMessage(w, m)
@@ -97,7 +97,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	err = db.Create(&user).Error
 	if err != nil {
-		m.Message = "Error: ocurrió algo inesperado al guardar el registro"
+		m.Message = "Ocurrió algo inesperado al guardar el registro"
 		m.StatusCode = http.StatusBadRequest
 		commons.DisplayMessage(w, m)
 
