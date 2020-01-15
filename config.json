@@ -1,7 +1,7 @@
 {
-    "server": "localhost",
+    "server": "remotemysql.com",
     "port": "3306",
-    "user": "root",
-    "password": "",
-    "database": "edcomments"
+    "user": "iJW0uxC3pj",
+    "password": "SH1GKoE8rF",
+    "database": "iJW0uxC3pj"
 }
