@@ -7,12 +7,20 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/olahol/melody"
+	"golang.org/x/net/websocket"
+
 	"github.com/fdiezdev/edcomments/commons"
 	"github.com/fdiezdev/edcomments/config"
 	"github.com/fdiezdev/edcomments/models"
 )
 
-//"github.com/fdiezdev/edcomments/models"
+// Melody -> permite utilizar realtime
+var Melody *melody.Melody
+
+func init() {
+	Melody = melody.New()
+}
 
 // CreateComment -> creates a comment
 func CreateComment(w http.ResponseWriter, r *http.Request) {
@@ -44,6 +52,29 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 
 		commons.DisplayMessage(w, m)
 		return
+	}
+
+	db.Model(&comment).Related(&comment.User)
+	comment.User[0].Password = ""
+
+	j, err := json.Marshal(&comment)
+	if err != nil {
+		m.StatusCode = http.StatusInternalServerError
+		m.Message = fmt.Sprintf("Error: %s", err)
+
+		commons.DisplayMessage(w, m)
+	}
+
+	origin := fmt.Sprintf("http://localhost:%d", commons.Port)
+	url := fmt.Sprintf("ws://localhost:%d/ws", commons.Port)
+	ws, err := websocket.Dial(url, "", origin)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err := ws.Write(j); err != nil {
+		log.Fatal(err)
 	}
 
 	m.StatusCode = http.StatusCreated
@@ -98,7 +129,10 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 	for i := range comments {
 
 		db.Model(&comments[i]).Related(&comments[i].User)
-		comments[i].User[0].Password = ""
+
+		for u := range comments[i].User {
+			comments[i].User[u].Password = ""
+		}
 
 		comments[i].Children = getCommentChildren(comments[i].ID)
 
